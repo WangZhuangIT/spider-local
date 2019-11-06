@@ -1,8 +1,8 @@
 package main
 
 import (
-	"spider-local/engine"
-	"spider-local/zhenai/parser"
+	"spider/engine"
+	"spider/zhenai/parser"
 )
 
 func main() {

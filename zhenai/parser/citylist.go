@@ -2,7 +2,7 @@ package parser
 
 import (
 	"regexp"
-	"spider-local/engine"
+	"spider/engine"
 )
 
 func ParseCityList(contents []byte) engine.ParseResult {

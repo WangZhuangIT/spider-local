@@ -2,8 +2,8 @@ package parser
 
 import (
 	"regexp"
-	"spider-local/engine"
-	"spider-local/model"
+	"spider/engine"
+	"spider/model"
 	"strconv"
 	"strings"
 )

@@ -2,7 +2,7 @@ package engine
 
 import (
 	"log"
-	"spider-local/fetcher"
+	"spider/fetcher"
 )
 
 func Run(seeds ...Request) {
@@ -12,20 +12,25 @@ func Run(seeds ...Request) {
 	for len(queue) > 0 {
 		curRequest := queue[0]
 		queue = queue[1:]
-
-		contents, err := fetcher.Fetch(curRequest.Url)
-
-		log.Printf("fetching : %v", curRequest.Url)
-		if err != nil {
-			log.Printf("fetch err : %v", err)
+		result,err:=worker(curRequest)
+		if err != nil{
 			continue
 		}
-
-		result := curRequest.ParseFunc(contents)
 		queue = append(queue, result.Requests...)
 
 		for k, v := range result.Items {
 			log.Printf("item%v: %v\n", k, v)
 		}
 	}
+}
+
+func worker(r Request) (ParseResult,error)  {
+	contents, err := fetcher.Fetch(r.Url)
+	log.Printf("fetching : %v", r.Url)
+	if err != nil {
+		log.Printf("fetch err : %v", err)
+		return ParseResult{},err
+	}
+
+	return r.ParseFunc(contents),nil
 }
