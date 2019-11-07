@@ -13,10 +13,10 @@ import (
 	"time"
 )
 
-var rateLimiter = time.Tick(10*time.Millisecond)
+var rateLimiter = time.Tick(10 * time.Millisecond)
 
 func Fetch(url string) ([]byte, error) {
-	<-rateLimiter
+	//<-rateLimiter
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

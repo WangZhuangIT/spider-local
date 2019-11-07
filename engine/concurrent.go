@@ -5,36 +5,36 @@ import (
 )
 
 type ConcurrentEngine struct {
-	Scheduler  Scheduler
-	WorkNum int
+	Scheduler Scheduler
+	WorkNum   int
 }
 
 type Scheduler interface {
 	Submit(Request)
 	ConfigureMasterWorkChan(chan Request)
+	WorkerReady(chan Request)
+	Run()
 }
 
-func (e *ConcurrentEngine) Run(seeds ...Request)  {
-	in := make(chan Request)
+func (e *ConcurrentEngine) Run(seeds ...Request) {
 	out := make(chan ParseResult)
+	e.Scheduler.Run()
 
-	for i:=0;i<e.WorkNum;i++ {
-		createWork(in,out)
+	for i := 0; i < e.WorkNum; i++ {
+		createWork(out, e.Scheduler)
 	}
 
-	e.Scheduler.ConfigureMasterWorkChan(in)
-
-	for _,r:=range seeds {
+	for _, r := range seeds {
 		e.Scheduler.Submit(r)
 	}
 
 	for {
 		result := <-out
-		for _,item := range result.Items{
-			log.Printf("item :%v",item)
+		for _, item := range result.Items {
+			log.Printf("item :%v", item)
 		}
 
-		for _,request := range result.Requests{
+		for _, request := range result.Requests {
 			e.Scheduler.Submit(request)
 		}
 
@@ -42,15 +42,18 @@ func (e *ConcurrentEngine) Run(seeds ...Request)  {
 
 }
 
-func createWork(in chan Request, out chan ParseResult) {
+func createWork(out chan ParseResult, s Scheduler) {
+	job := make(chan Request)
 	go func() {
-		for  {
-			r := <-in
-			result,err:=worker(r)
-			if err != nil{
+		for {
+			//tell scheduler i am ready
+			s.WorkerReady(job)
+			r := <-job
+			result, err := worker(r)
+			if err != nil {
 				continue
 			}
-			out<-result 
+			out <- result
 		}
 	}()
 }
