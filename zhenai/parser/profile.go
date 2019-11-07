@@ -42,6 +42,10 @@ func formatUser(contents []byte) *model.User {
 		return nil
 	}
 
+	if len(machsDetailArr) < 6 {
+		return  nil
+	}
+
 	age, _ := strconv.Atoi(strings.Replace(machsDetailArr[1], "岁", "", -1))
 	height, _ := strconv.Atoi(strings.Replace(machsDetailArr[4], "cm", "", -1))
 	user.Address = machsDetailArr[0]

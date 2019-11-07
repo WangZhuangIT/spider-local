@@ -5,7 +5,12 @@ import (
 	"spider/fetcher"
 )
 
-func Run(seeds ...Request) {
+type SimpleEngine struct {
+
+}
+
+
+func (SimpleEngine)Run(seeds ...Request) {
 	queue := make([]Request, 0)
 	queue = append(queue, seeds...)
 
