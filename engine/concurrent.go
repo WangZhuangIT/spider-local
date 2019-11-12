@@ -2,12 +2,12 @@ package engine
 
 import (
 	"log"
-	"spider/model"
 )
 
 type ConcurrentEngine struct {
 	Scheduler Scheduler
 	WorkNum   int
+	ItemSaver chan Item
 }
 
 type Scheduler interface {
@@ -37,14 +37,12 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 		e.Scheduler.Submit(r)
 	}
 
-	userCount := 0
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			if _, ok := item.(*model.User); ok {
-				userCount++
-				log.Printf("item %v :%v", userCount, item)
-			}
+			go func() {
+				e.ItemSaver <- item
+			}()
 		}
 
 		for _, request := range result.Requests {

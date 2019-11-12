@@ -8,18 +8,19 @@ import (
 	"strings"
 )
 
-func ParseProfile(contents []byte) engine.ParseResult {
+func ParseProfile(contents []byte, url string) engine.ParseResult {
 	var result engine.ParseResult
-	user := formatUser(contents)
-	if user == nil {
+	item := formatItem(contents, url)
+	if item == nil {
 		return result
 	}
-	result.Items = append(result.Items, user)
+	result.Items = append(result.Items, *item)
 	return result
 }
 
-func formatUser(contents []byte) *model.User {
-	user := new(model.User)
+func formatItem(contents []byte, url string) *engine.Item {
+	var user model.User
+	item := new(engine.Item)
 	//class="nickName">duck</h1>
 	//class="id">ID：1570330383</div>
 	//class="des f-cl">佛山 | 33 岁 | 高中及以下 | 未婚 | 179cm | 5001-8000 元<
@@ -33,20 +34,10 @@ func formatUser(contents []byte) *model.User {
 	if len(machsName) < 2 || len(machsID) < 2 || len(machsDetail) < 2 {
 		return nil
 	}
-
 	user.Name = string(machsName[1])
-	userId, err := strconv.Atoi(string(machsID[1]))
-	if err != nil {
-		return nil
-	}
-	user.Id = userId
 	machsDetailArr := strings.Split(strings.Replace(string(machsDetail[1]), " ", "", -1), "|")
 
 	if len(machsDetailArr) != 6 {
-		return nil
-	}
-
-	if len(machsDetailArr) < 6 {
 		return nil
 	}
 
@@ -58,6 +49,11 @@ func formatUser(contents []byte) *model.User {
 	user.Married = machsDetailArr[3]
 	user.Height = height
 	user.Salary = strings.Replace(machsDetailArr[5], "元", "", -1)
-	return user
+
+	item.Payload = user
+	item.Id = string(machsID[1])
+	item.Type = "zhenai"
+	item.Url = url
+	return item
 
 }

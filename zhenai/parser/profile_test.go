@@ -12,7 +12,7 @@ func TestParseProfile(t *testing.T) {
 		panic(err)
 	}
 
-	result := ParseProfile(contents)
+	result := ParseProfile(contents, "http://www.baidu.com")
 
 	for _, v := range result.Items {
 		fmt.Println(v)
