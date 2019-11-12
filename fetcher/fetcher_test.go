@@ -3,6 +3,6 @@ package fetcher
 import "testing"
 
 func TestFetch(t *testing.T) {
-	contents, err := Fetch("http://album.zhenai.com/u/1445144756")
+	contents, err := Fetch("https://album.zhenai.com/u/1059758035")
 	t.Log(string(contents), err)
 }

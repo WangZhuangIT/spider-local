@@ -10,6 +10,8 @@ type ParseResult struct {
 	Items    []interface{}
 }
 
+type Worker chan Request
+
 func NilRequestFunc([]byte) ParseResult {
 	return ParseResult{}
 }

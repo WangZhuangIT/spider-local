@@ -2,6 +2,7 @@ package engine
 
 import (
 	"log"
+	"spider/model"
 )
 
 type ConcurrentEngine struct {
@@ -12,12 +13,12 @@ type ConcurrentEngine struct {
 type Scheduler interface {
 	ReadyNotifier
 	Submit(Request)
-	WorkChanType() chan Request
+	WorkerChanType() Worker
 	Run()
 }
 
 type ReadyNotifier interface {
-	WorkerReady(chan Request)
+	WorkerReady(Worker)
 }
 
 func (e *ConcurrentEngine) Run(seeds ...Request) {
@@ -25,20 +26,31 @@ func (e *ConcurrentEngine) Run(seeds ...Request) {
 	e.Scheduler.Run()
 
 	for i := 0; i < e.WorkNum; i++ {
-		createWork(e.Scheduler.WorkChanType(), out, e.Scheduler)
+		createWork(e.Scheduler.WorkerChanType(), out, e.Scheduler)
 	}
 
 	for _, r := range seeds {
+		if isDuplicate(r.Url) {
+			log.Printf("duplicate url : %v", r.Url)
+			continue
+		}
 		e.Scheduler.Submit(r)
 	}
 
+	userCount := 0
 	for {
 		result := <-out
 		for _, item := range result.Items {
-			log.Printf("item :%v", item)
+			if _, ok := item.(*model.User); ok {
+				userCount++
+				log.Printf("item %v :%v", userCount, item)
+			}
 		}
 
 		for _, request := range result.Requests {
+			if isDuplicate(request.Url) {
+				continue
+			}
 			e.Scheduler.Submit(request)
 		}
 
@@ -59,4 +71,14 @@ func createWork(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 			out <- result
 		}
 	}()
+}
+
+var visitedUrls = make(map[string]bool)
+
+func isDuplicate(url string) bool {
+	if visitedUrls[url] {
+		return true
+	}
+	visitedUrls[url] = true
+	return false
 }

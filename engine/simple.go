@@ -6,19 +6,17 @@ import (
 )
 
 type SimpleEngine struct {
-
 }
 
-
-func (SimpleEngine)Run(seeds ...Request) {
+func (SimpleEngine) Run(seeds ...Request) {
 	queue := make([]Request, 0)
 	queue = append(queue, seeds...)
 
 	for len(queue) > 0 {
 		curRequest := queue[0]
 		queue = queue[1:]
-		result,err:=worker(curRequest)
-		if err != nil{
+		result, err := worker(curRequest)
+		if err != nil {
 			continue
 		}
 		queue = append(queue, result.Requests...)
@@ -29,13 +27,12 @@ func (SimpleEngine)Run(seeds ...Request) {
 	}
 }
 
-func worker(r Request) (ParseResult,error)  {
+func worker(r Request) (ParseResult, error) {
 	contents, err := fetcher.Fetch(r.Url)
-	log.Printf("fetching : %v", r.Url)
 	if err != nil {
 		log.Printf("fetch err : %v", err)
-		return ParseResult{},err
+		return ParseResult{}, err
 	}
 
-	return r.ParseFunc(contents),nil
+	return r.ParseFunc(contents), nil
 }

@@ -30,6 +30,10 @@ func formatUser(contents []byte) *model.User {
 	machsID := reId.FindSubmatch(contents)
 	machsDetail := reDetail.FindSubmatch(contents)
 
+	if len(machsName) < 2 || len(machsID) < 2 || len(machsDetail) < 2 {
+		return nil
+	}
+
 	user.Name = string(machsName[1])
 	userId, err := strconv.Atoi(string(machsID[1]))
 	if err != nil {
@@ -43,7 +47,7 @@ func formatUser(contents []byte) *model.User {
 	}
 
 	if len(machsDetailArr) < 6 {
-		return  nil
+		return nil
 	}
 
 	age, _ := strconv.Atoi(strings.Replace(machsDetailArr[1], "岁", "", -1))

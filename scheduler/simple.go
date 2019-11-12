@@ -3,22 +3,22 @@ package scheduler
 import "spider/engine"
 
 type SimpleScheduler struct {
-	WorkChan chan engine.Request
+	WorkerChan engine.Worker
 }
 
-func (s *SimpleScheduler) WorkChanType() chan engine.Request {
-	return s.WorkChan
+func (s *SimpleScheduler) WorkerChanType() engine.Worker {
+	return s.WorkerChan
 }
 
-func (s *SimpleScheduler) WorkerReady(chan engine.Request) {
+func (s *SimpleScheduler) WorkerReady(engine.Worker) {
 }
 
 func (s *SimpleScheduler) Run() {
-	s.WorkChan = make(chan engine.Request)
+	s.WorkerChan = make(engine.Worker)
 }
 
 func (s *SimpleScheduler) Submit(r engine.Request) {
 	go func() {
-		s.WorkChan <- r
+		s.WorkerChan <- r
 	}()
 }
