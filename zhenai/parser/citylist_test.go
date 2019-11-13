@@ -12,7 +12,7 @@ func TestParseCityList(t *testing.T) {
 		panic(err)
 	}
 
-	result := ParseCityList(contents)
+	result := ParseCityList(contents, "")
 	const resultSize = 470
 	if len(result.Requests) != resultSize {
 		t.Errorf("result should have %d , but have %d ", resultSize, len(result.Requests))
