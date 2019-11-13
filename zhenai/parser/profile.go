@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"log"
 	"regexp"
 	"spider/engine"
 	"spider/model"
@@ -32,12 +33,14 @@ func formatItem(contents []byte, url string) *engine.Item {
 	machsDetail := reDetail.FindSubmatch(contents)
 
 	if len(machsName) < 2 || len(machsID) < 2 || len(machsDetail) < 2 {
+		log.Printf("profile %v %v %v %v", url, len(machsName), len(machsID), len(machsDetail))
 		return nil
 	}
 	user.Name = string(machsName[1])
 	machsDetailArr := strings.Split(strings.Replace(string(machsDetail[1]), " ", "", -1), "|")
 
 	if len(machsDetailArr) != 6 {
+		log.Printf("profile %v %v", url, len(machsDetailArr))
 		return nil
 	}
 

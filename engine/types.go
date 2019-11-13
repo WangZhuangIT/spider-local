@@ -2,8 +2,10 @@ package engine
 
 type Request struct {
 	Url       string
-	ParseFunc func([]byte) ParseResult
+	ParseFunc ParseFunc
 }
+
+type ParseFunc func([]byte, string) ParseResult
 
 type ParseResult struct {
 	Requests []Request

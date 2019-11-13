@@ -8,38 +8,38 @@ import (
 	"spider/engine"
 )
 
-func ItemSaver() chan engine.Item {
+func ItemSaver(index string) (chan engine.Item, error) {
 	out := make(chan engine.Item)
 
-	go func() {
-		for {
-			item := <-out
-			log.Printf("item : %v", item)
-			err := save(item)
-			if err != nil {
-				log.Printf("item saver err : %v item : %v", err, item)
-			}
-		}
-	}()
-	return out
-}
-
-func save(item engine.Item) (err error) {
 	client, err := elastic.NewClient(
 		// must set false in docker,维护集群状态的，docker不需要
 		elastic.SetSniff(false),
 	)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	go func() {
+		for {
+			item := <-out
+			log.Printf("item : %v", item)
+			err := save(item, client, index)
+			if err != nil {
+				log.Printf("item saver err : %v item : %v", err, item)
+			}
+		}
+	}()
+	return out, nil
+}
+
+func save(item engine.Item, client *elastic.Client, index string) (err error) {
 	if item.Type == "" {
 		return errors.New("item type empty")
 	}
 
 	indexService := client.Index().
-		Index("dating_profile").
+		Index(index).
 		Type(item.Type).BodyJson(item)
 
 	if item.Id != "" {

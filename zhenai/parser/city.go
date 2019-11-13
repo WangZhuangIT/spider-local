@@ -12,17 +12,15 @@ var (
 	regCityUrl = regexp.MustCompile(`<a href="(http://www.zhenai.com/zhenghun/shanghai/[^"]+)"`)
 )
 
-func ParseCity(contents []byte) engine.ParseResult {
+func ParseCity(contents []byte, _ string) engine.ParseResult {
 	var result engine.ParseResult
 	machs := regProfile.FindAllSubmatch(contents, -1)
 	for _, v := range machs {
 		url := string(v[1])
 		result.Requests = append(result.Requests,
 			engine.Request{
-				Url: url,
-				ParseFunc: func(bytes []byte) engine.ParseResult {
-					return ParseProfile(contents, url)
-				},
+				Url:       url,
+				ParseFunc: ProfileParse(),
 			})
 	}
 
@@ -36,4 +34,10 @@ func ParseCity(contents []byte) engine.ParseResult {
 			})
 	}
 	return result
+}
+
+func ProfileParse() engine.ParseFunc {
+	return func(c []byte, url string) engine.ParseResult {
+		return ParseProfile(c, url)
+	}
 }

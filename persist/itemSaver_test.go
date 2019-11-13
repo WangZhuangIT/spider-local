@@ -25,16 +25,18 @@ func TestSave(t *testing.T) {
 			Height:    65,
 		},
 	}
-	err := save(user)
-
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	// TODO: try to start up es search
 	// here using docker go client,启动es
 	client, err := elastic.NewClient(
 		elastic.SetSniff(false))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const index = "dating_test"
+	err = save(user, client, index)
 
 	if err != nil {
 		t.Fatal(err)
